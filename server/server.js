@@ -106,8 +106,8 @@ app.post('/users', (req, res) => {
     var user = new User(body);
     user.save().then((user) => {
         res.status(200).send(user);
-    
-    }).catch((e)=>{
+
+    }).catch((e) => {
         res.status(400).send(e);
     });
 });
