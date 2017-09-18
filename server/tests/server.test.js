@@ -143,7 +143,7 @@ describe('DELETE /todos/:id', () => {
             .expect(404)
             .end(done);
     });
-    it('should remove a todo', (done) => {
+    it('should not remove a todo created by other user', (done) => {
         var hexId = todos[0]._id.toHexString();
 
         request(app)
