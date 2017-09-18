@@ -10,7 +10,6 @@ var { Todo } = require('./models/todo');
 var { User } = require('./models/user');
 var { authenticate } = require('./middleware/authenticate');
 
-
 var app = express();
 const port = process.env.PORT;
 
@@ -20,6 +19,7 @@ app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text
     });
+
     todo.save().then((doc) => {
         res.send(doc);
     }, (e) => {
@@ -35,20 +35,18 @@ app.get('/todos', (req, res) => {
     });
 });
 
-// GET /todos/123
 app.get('/todos/:id', (req, res) => {
     var id = req.params.id;
 
-    // Validate ID    
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
     }
 
-    // Find the todos collection by ID
     Todo.findById(id).then((todo) => {
         if (!todo) {
             return res.status(404).send();
         }
+
         res.send({ todo });
     }).catch((e) => {
         res.status(400).send();
@@ -56,19 +54,17 @@ app.get('/todos/:id', (req, res) => {
 });
 
 app.delete('/todos/:id', (req, res) => {
-    // get the id
     var id = req.params.id;
 
-    // validate the id
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
     }
 
-    // remove todo by id
     Todo.findByIdAndRemove(id).then((todo) => {
         if (!todo) {
             return res.status(404).send();
         }
+
         res.send({ todo });
     }).catch((e) => {
         res.status(400).send();
@@ -82,10 +78,10 @@ app.patch('/todos/:id', (req, res) => {
     if (!ObjectID.isValid(id)) {
         return res.status(404).send();
     }
+
     if (_.isBoolean(body.completed) && body.completed) {
         body.completedAt = new Date().getTime();
-    }
-    else {
+    } else {
         body.completed = false;
         body.completedAt = null;
     }
@@ -94,10 +90,11 @@ app.patch('/todos/:id', (req, res) => {
         if (!todo) {
             return res.status(404).send();
         }
+
         res.send({ todo });
     }).catch((e) => {
         res.status(400).send();
-    });
+    })
 });
 
 // POST /users
@@ -111,15 +108,29 @@ app.post('/users', (req, res) => {
         res.header('x-auth', token).send(user);
     }).catch((e) => {
         res.status(400).send(e);
-    });
+    })
 });
 
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
 
+// POST /users/login {email, password}
+app.post('/users/login', (req, res) => {
+    var body = _.pick(req.body, ['email', 'password']);
+
+    User.findByCredentials(body.email, body.password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user);
+        });
+    }).catch((e) => {
+        console.log(e);
+        res.status(400).send();
+    });
+});
+
 app.listen(port, () => {
-    console.log(`Started on port ${port}`);
+    console.log(`Started up at port ${port}`);
 });
 
 module.exports = { app };
