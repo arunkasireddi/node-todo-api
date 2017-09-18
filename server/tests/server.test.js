@@ -109,7 +109,7 @@ describe('DELETE /todos/:id', () => {
 
         request(app)
             .delete(`/todos/${hexId}`)
-            .set('x-auth', users[1].tokens[1].token)
+            .set('x-auth', users[1].tokens[0].token)
             .expect(200)
             .expect((res) => {
                 expect(res.body.todo._id).toBe(hexId);
@@ -131,7 +131,7 @@ describe('DELETE /todos/:id', () => {
 
         request(app)
             .delete(`/todos/${hexID}`)
-            .set('x-auth', users[1].tokens[1].token)
+            .set('x-auth', users[1].tokens[0].token)
             .expect(404)
             .end(done);
 
@@ -139,7 +139,7 @@ describe('DELETE /todos/:id', () => {
     it('should return 404 if object id is invalid', (done) => {
         request(app)
             .delete('/todos/123abc')
-            .set('x-auth', users[1].tokens[1].token)
+            .set('x-auth', users[1].tokens[0].token)
             .expect(404)
             .end(done);
     });
@@ -148,7 +148,7 @@ describe('DELETE /todos/:id', () => {
 
         request(app)
             .delete(`/todos/${hexId}`)
-            .set('x-auth', users[1].tokens[1].token)
+            .set('x-auth', users[1].tokens[0].token)
             .expect(404)
             .end((err, res) => {
                 if (err) {
